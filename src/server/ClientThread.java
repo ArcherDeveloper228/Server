@@ -1,13 +1,18 @@
 package server;
 
-import java.net.ServerSocket;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.Socket;
 
 public class ClientThread extends Thread {
-
-	private ServerSocket server_socket;
-	private Socket socket;
-	//private 
+	
+	/** Property - stream */
+	PrintStream output_stream;
+	
+	/** Property - input_stream */
+	BufferedReader input_stream;
 	
 	/** 
 	 * Make new object ClientThread
@@ -15,8 +20,15 @@ public class ClientThread extends Thread {
 	 * */
 	public ClientThread(Socket socket) {
 		
+		try {
+			
+			this.output_stream = new PrintStream(socket.getOutputStream());
+			this.input_stream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		
-		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	
 	}
 	
 	@Override
