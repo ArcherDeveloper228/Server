@@ -6,6 +6,11 @@ import java.net.Socket;
 
 import database.Database;
 
+/**
+ * This class make server and contains information about server
+ * @author Nikita.Ustyushenko
+ * @version 1.0
+ * */
 public class Server extends Thread {
 
 	/** Property - database */
@@ -39,7 +44,8 @@ public class Server extends Thread {
 
 	@Override
 	public void run() {
-
+		
+		// запускаем работу сервера
 		while (true) {
 
 			try {
@@ -49,6 +55,7 @@ public class Server extends Thread {
 
 				// наращиваем количество подключенных клиентов к серверу
 				this.count_clients++;
+				// запускаем соеденение с клиентом в отдельном потоке
 				new ClientThread(this.socket).start();
 
 
