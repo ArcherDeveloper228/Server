@@ -50,21 +50,39 @@ public class Server extends Thread {
 
 			try {
 
+				System.out.println("Server running...");
+				
 				// ожидаем подключения клиента
 				this.socket = this.server_socket.accept();
-
+				
 				// наращиваем количество подключенных клиентов к серверу
 				this.count_clients++;
 				// запускаем соеденение с клиентом в отдельном потоке
 				new ClientThread(this.socket).start();
-
-
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 		}
 
+	}
+	
+	/***/
+	public void closeConnection() {
+		
+		if (this.server_socket != null) {
+			
+			try {
+				this.database.closeConnection();
+				this.server_socket.close();
+				System.out.println("Server ending...");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		} else ;
+		
 	}
 
 	/**

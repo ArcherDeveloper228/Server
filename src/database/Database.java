@@ -33,6 +33,7 @@ public class Database implements IConstDatabase {
 		
 		try {
 			this.connection = (Connection) DriverManager.getConnection(URL, CLIENT_NAME, CLIENT_PASSWORD);
+			System.out.println("Database running...");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -45,13 +46,16 @@ public class Database implements IConstDatabase {
 	public final void closeConnection() {
 		
 		// закрываем соеденение с базой данных mediateka
-		try {
-			this.connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NullPointerException e1) {
-			e1.printStackTrace();
-		}	
+		if (this.connection != null) {
+			
+			try {
+				this.connection.close();
+				System.out.println("Database ending...");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		} else ;
 		
 	}
 	

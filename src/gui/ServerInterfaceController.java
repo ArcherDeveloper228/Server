@@ -7,8 +7,10 @@ import server.Server;
 
 public class ServerInterfaceController {
 
+	/** Property - server */
 	private final Server server;
 
+	// логический блок для создания объекта сервера
 	{ this.server = new Server(); }
 
 	@FXML
@@ -18,13 +20,7 @@ public class ServerInterfaceController {
 	private Button start_button;
 
 	@FXML
-	private Button stop_button;
-
-	@FXML
-	private Label information_label_1;
-
-	@FXML
-	private Label information_label_2;
+	private Label information_label;
 
 	@FXML
 	private Label clients_label;
@@ -32,22 +28,23 @@ public class ServerInterfaceController {
 	@FXML
 	public void initialize() {
 
-		this.stop_button.setDisable(true);
-
+		// устанавливаем обработчик события для кнопки "Start"
 		this.start_button.setOnAction(event -> {
-
-			 this.server.start();
-			 this.start_button.setDisable(true);
-			 this.stop_button.setDisable(false);
-			 this.information_label_2.setText("");
-			 this.information_label_1.setText("Server connecting...");
-
+			
+			// запускаем сервер
+			this.server.start();
+			this.start_button.setDisable(true);
+			this.information_label.setText("Server running...");
+			
 		});
-
+		
+		// устанавливаем обработчик события для кнопки "Exit"
 		this.exit_button.setOnAction(event -> {
-
+			
+			this.server.closeConnection();
 			this.exit_button.getScene().getWindow().hide();
-
+			System.exit(1);
+		
 		});
 
 	}

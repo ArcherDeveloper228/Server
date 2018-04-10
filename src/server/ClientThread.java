@@ -8,7 +8,7 @@ import java.net.Socket;
 
 public class ClientThread extends Thread {
 	
-	/** Property - stream */
+	/** Property - output_stream */
 	PrintStream output_stream;
 	
 	/** Property - input_stream */
