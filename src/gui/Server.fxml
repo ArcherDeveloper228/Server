@@ -5,24 +5,29 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="132.0" prefWidth="401.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerInterfaceController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="132.0" prefWidth="492.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerInterfaceController">
    <children>
-      <Button fx:id="exit_button" layoutX="281.0" layoutY="80.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="106.0" text="Exit">
+      <Button fx:id="exit_button" layoutX="372.0" layoutY="80.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="106.0" text="Exit">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
-      <Label fx:id="information_label" layoutX="14.0" layoutY="30.0" prefHeight="30.0" prefWidth="261.0">
+      <Label fx:id="information_label" layoutX="14.0" layoutY="30.0" prefHeight="30.0" prefWidth="345.0">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <Label fx:id="clients_label" layoutX="14.0" layoutY="81.0" prefHeight="30.0" prefWidth="261.0" text="Number of clients: ">
+      <Label fx:id="clients_label" layoutX="14.0" layoutY="81.0" prefHeight="30.0" prefWidth="240.0" text="Number of clients: ">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <Button fx:id="start_button" layoutX="281.0" layoutY="29.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="106.0" text="Start">
+      <Button fx:id="start_button" layoutX="372.0" layoutY="29.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="106.0" text="Start">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <Button fx:id="update_button" layoutX="254.0" layoutY="81.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="106.0" text="Update">
          <font>
             <Font size="15.0" />
          </font>

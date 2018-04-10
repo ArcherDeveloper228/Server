@@ -6,36 +6,42 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
+import javax.swing.JFrame;
+
 public class ClientThread extends Thread {
-	
+
 	/** Property - output_stream */
 	PrintStream output_stream;
-	
+
 	/** Property - input_stream */
 	BufferedReader input_stream;
-	
-	/** 
+
+	/**
 	 * Make new object ClientThread
 	 * @param socket value of the socket client
 	 * */
 	public ClientThread(Socket socket) {
-		
+
 		try {
-			
+
 			this.output_stream = new PrintStream(socket.getOutputStream());
 			this.input_stream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		
+
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
-	
+		}
+
 	}
-	
+
 	@Override
 	public void run() {
-		
-		
-		
+
+		JFrame frame = new JFrame();
+		frame.setTitle("Hello client");
+		frame.setVisible(true);
+		frame.setResizable(false);
+		frame.setSize(400, 400);
+
 	}
-	
+
 }

@@ -24,12 +24,12 @@ public class Server extends Thread {
 
 	/** Property - count_clients */
 	private int count_clients;
-
+	
 	/**
 	 * Make new object Server
 	 * */
 	public Server() {
-
+		
 		this.count_clients = 0;
 		this.database = new Database();
 
@@ -46,15 +46,14 @@ public class Server extends Thread {
 	public void run() {
 		
 		// запускаем работу сервера
-		while (true) {
+		while (!Thread.interrupted()) {
 
 			try {
 
 				System.out.println("Server running...");
-				
+			
 				// ожидаем подключения клиента
 				this.socket = this.server_socket.accept();
-				
 				// наращиваем количество подключенных клиентов к серверу
 				this.count_clients++;
 				// запускаем соеденение с клиентом в отдельном потоке
@@ -68,20 +67,14 @@ public class Server extends Thread {
 
 	}
 	
-	/***/
+	/**
+	 * This method close connection with server 
+	 * */
 	public void closeConnection() {
 		
-		if (this.server_socket != null) {
-			
-			try {
-				this.database.closeConnection();
-				this.server_socket.close();
-				System.out.println("Server ending...");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		} else ;
+		super.interrupt();
+		this.database.closeConnection();
+		System.out.println("Server ending...");
 		
 	}
 
