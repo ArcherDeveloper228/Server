@@ -24,14 +24,15 @@ public class Server extends Thread {
 
 	/** Property - count_clients */
 	private int count_clients;
-	
+
 	/**
 	 * Make new object Server
 	 * */
 	public Server() {
-		
+
 		this.count_clients = 0;
 		this.database = new Database();
+		this.socket = null;
 
 		// выполняем создание сервер сокета с портом 9999
 		try {
@@ -44,21 +45,21 @@ public class Server extends Thread {
 
 	@Override
 	public void run() {
-		
+
 		// запускаем работу сервера
 		while (!Thread.interrupted()) {
 
 			try {
 
 				System.out.println("Server running...");
-			
+
 				// ожидаем подключения клиента
 				this.socket = this.server_socket.accept();
 				// наращиваем количество подключенных клиентов к серверу
 				this.count_clients++;
 				// запускаем соеденение с клиентом в отдельном потоке
-				new ClientThread(this.socket).start();
-				
+				new ClientThread(this.socket, this.database).start();
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -66,16 +67,16 @@ public class Server extends Thread {
 		}
 
 	}
-	
+
 	/**
-	 * This method close connection with server 
+	 * This method close connection with server
 	 * */
 	public void closeConnection() {
-		
+
 		super.interrupt();
 		this.database.closeConnection();
 		System.out.println("Server ending...");
-		
+
 	}
 
 	/**

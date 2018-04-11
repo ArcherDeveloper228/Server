@@ -7,6 +7,8 @@ import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 import com.mysql.jdbc.Statement;
 
+import application.User;
+
 /**
  * This class make connection with database mediateka
  * @author Nikita.Ustyushenko
@@ -57,6 +59,46 @@ public class Database implements IConstDatabase {
 			
 		} else ;
 		
+	}
+	
+	/**
+	 * This method add user in database
+	 * @param user it is object contains information about user
+	 * */
+	public void addUser(User user) {
+
+		try {
+
+			this.prepared_statement = (PreparedStatement) this.connection.prepareStatement(SQL_INSERT_USER);
+
+			this.prepared_statement.setString(1, user.getName());
+			this.prepared_statement.setString(2, user.getSurname());
+			this.prepared_statement.setInt(3, user.getDayOfBirth());
+			this.prepared_statement.setString(4, user.getMonthOfBirth());
+			this.prepared_statement.setInt(5, user.getYearOfBirth());
+			this.prepared_statement.setString(6, user.getSex());
+			this.prepared_statement.setString(7, user.getUserLogin());
+			this.prepared_statement.setInt(8, user.getUserPassword());
+
+			this.prepared_statement.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+
+			// если объект PreparedStatement не null, то закрываем его
+			if (this.prepared_statement != null) {
+
+				try {
+					this.prepared_statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+			}
+
+		}
+
 	}
 	
 }
