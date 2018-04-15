@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import application.User;
 import database.Database;
@@ -32,6 +34,7 @@ public class ClientThread extends Thread {
 		this.database = null;
 		this.output_stream = null;
 		this.input_stream = null;
+		this.object_input_stream = null;
 		
 	}
 	
@@ -47,6 +50,7 @@ public class ClientThread extends Thread {
 			this.database = database;
 			this.output_stream = new PrintStream(socket.getOutputStream());
 			this.input_stream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			this.object_input_stream = (ObjectInputStream) socket.getInputStream();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -57,9 +61,39 @@ public class ClientThread extends Thread {
 	@Override
 	public void run() {
 		
-		User user = new User();
+		String string;
+		try {
+			while ((string = this.input_stream.readLine()) != null) {
+				
+				System.out.println(string);
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 
+	}
+	
+	/**
+	 * 
+	 * */
+	private boolean checkData(User user) {
+		
+		ResultSet result_set = null;
+		
+		try {
+			
+			result_set = this.database.getResult("SELECT * FROM user WHERE login='" + user.getUserLogin() + "'");
+			if (result_set.)
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return true;
+		
 	}
 	
 	public Database getDatabase() {

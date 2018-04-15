@@ -1,6 +1,7 @@
 package database;
 
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.mysql.jdbc.Connection;
@@ -41,6 +42,24 @@ public class Database implements IConstDatabase {
 		}
 		
 	}
+	
+	public ResultSet getResult(String inquiry) {
+		
+		ResultSet result_set = null;
+		
+		try {
+			
+			this.statement = (Statement) this.connection.createStatement();
+			result_set = this.statement.executeQuery(inquiry);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return result_set;
+		
+	}
+	
 	
 	/** 
 	 * This method close connection with database mediateka
