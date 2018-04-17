@@ -3,10 +3,10 @@ package application;
 import gui.ServerInterface;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import server.Server;
 
 
 public class Main extends Application {
+	
 	@Override
 	public void start(Stage primaryStage) {
 		
