@@ -13,6 +13,9 @@ import database.Database;
  * */
 public class Server extends Thread {
 
+	/** Property - port */
+	private static final int SERVER_PORT = 9999;
+	
 	/** Property - database */
 	private Database database;
 
@@ -36,7 +39,7 @@ public class Server extends Thread {
 
 		// выполняем создание сервер сокета с портом 9999
 		try {
-			this.server_socket = new ServerSocket(9999);
+			this.server_socket = new ServerSocket(SERVER_PORT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
