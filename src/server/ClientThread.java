@@ -1,16 +1,9 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.PrintStream;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import application.User;
 import database.Database;
+import json.UserComand;
 
 public class ClientThread extends Thread {
 
@@ -45,7 +38,22 @@ public class ClientThread extends Thread {
 	@Override
 	public void run() {
 
+		System.out.println("Client is running...");
+		UserComand user_command = null;
+		
+		while (!Thread.interrupted()) {
 
+			user_command = this.server_interface.readMessage();
+			
+			switch (user_command.getCommand()) {
+			
+			case "Wait": System.out.println("Command: wait"); break;
+			case "Registration": System.out.println("Command: registration"); break; 
+			case "Authorization": break;
+			
+			}
+
+		}
 
 	}
 
