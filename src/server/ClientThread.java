@@ -7,6 +7,9 @@ import json.UserComand;
 
 public class ClientThread extends Thread {
 
+	/** Property - socket */
+	private Socket socket;
+	
 	/** Property - database */
 	private Database database;
 
@@ -18,6 +21,7 @@ public class ClientThread extends Thread {
 	 * */
 	public ClientThread() {
 
+		this.socket = null;
 		this.database = null;
 		this.server_interface = null;
 
@@ -30,6 +34,7 @@ public class ClientThread extends Thread {
 	 * */
 	public ClientThread(Socket socket, Database database) {
 
+		this.socket = socket;
 		this.database = database;
 		this.server_interface = new ServerInterface(socket);
 
@@ -40,19 +45,16 @@ public class ClientThread extends Thread {
 
 		System.out.println("Client is running...");
 		UserComand user_command = null;
-		
-		while (!Thread.interrupted()) {
+			
+		user_command = this.server_interface.readMessage();
+			
+		System.out.println("я что-то прочитал");
+			
+		switch (user_command.getCommand()) {
 
-			user_command = this.server_interface.readMessage();
+		case "Registration": System.out.println(user_command.getUser()); break;
+		case "Authorization": System.out.println("Command"); break;
 			
-			switch (user_command.getCommand()) {
-			
-			case "Wait": System.out.println("Command: wait"); break;
-			case "Registration": System.out.println("Command: registration"); break; 
-			case "Authorization": break;
-			
-			}
-
 		}
 
 	}
@@ -96,5 +98,25 @@ public class ClientThread extends Thread {
 		this.server_interface = server_interface;
 
 	}
+	
+	/**
+	 * This method return value of the object Socket
+	 * @return value of the object Socket
+	 * */
+	public Socket getSocket() {
+		
+		return this.socket;
+		
+	}
+	
+	/**
+	 * This method set value of the object Socket 
+	 * @param socket value o the object Socket
+	 * */
+	public void setSocket(Socket socket) {
+		
+		this.socket = socket;
+		
+	} 
 
 }

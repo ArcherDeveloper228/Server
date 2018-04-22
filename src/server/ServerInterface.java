@@ -64,7 +64,11 @@ public class ServerInterface implements ConstServer {
 		
 		try {
 			
-			if ((json = this.buffered_reader.readLine()) != null) user_comand = this.json_parser.parseUserJson(json);
+			if ((json = this.buffered_reader.readLine()) != null) {
+				
+				user_comand = this.json_parser.parseUserJson(json);
+				
+			}
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -73,6 +77,32 @@ public class ServerInterface implements ConstServer {
 		return user_comand; 
 		
 	}
+	
+	/**
+	 * This method close connection with all threads
+	 * */
+	public void closeConnection() {
+		
+		// если поток чтения не null, то закрываем его
+		if (this.buffered_reader != null) {
+			
+			try {
+				this.buffered_reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		// если поток записи не null, то закрываем его
+		if (this.print_stream != null) {
+			
+			this.print_stream.flush();
+			this.print_stream.close();
+			
+		}
+		
+	} 
 	
 	/**
 	 * This method return value of the object Socket
