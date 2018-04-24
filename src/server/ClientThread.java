@@ -1,7 +1,10 @@
 package server;
 
 import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+import application.User;
 import database.Database;
 import json.UserComand;
 
@@ -48,15 +51,57 @@ public class ClientThread extends Thread {
 			
 		user_command = this.server_interface.readMessage();
 			
-		System.out.println("я что-то прочитал");
-			
 		switch (user_command.getCommand()) {
 
-		case "Registration": System.out.println(user_command.getUser()); break;
-		case "Authorization": System.out.println("Command"); break;
+		case "Registration": this.registrationUser(user_command.getUser()); break;
+		case "Authorization": this.authorizationUser(user_command.getUser()); break;
 			
 		}
 
+	}
+	
+	/**
+	 * This method check user in database 
+	 * @param user value of the object User
+	 * */
+	private final void authorizationUser(User user) {
+		
+		String attention = new String("Check your login (password)!");
+		ResultSet result_set = null;
+		
+		try {
+			
+			result_set = this.database.getResult("SELECT * FROM user WHERE login=\"" + user.getUserLogin() + "\"");
+			
+			if (!result_set.next()) this.server_interface.writeMessage(attention);
+			else if (result_set.getInt(9) == user.getUserPassword()) this.server_interface.writeMessage("Ok");
+			else this.server_interface.writeMessage(attention);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * This method add user into database
+	 * @param user value of the object User
+	 * */
+	private final void registrationUser(User user) {
+		
+		try {
+			
+			if (!this.database.getResult("SELECT * FROM USER WHERE login=\"" + user.getUserLogin() + "\"").next()) {
+				
+				this.database.addUser(user);
+				this.server_interface.writeMessage("Ok");
+				
+			} else this.server_interface.writeMessage("This login is already exists!");
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**
