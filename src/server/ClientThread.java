@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import application.User;
 import database.Database;
+import json.FileCommand;
 import json.UserComand;
 
 public class ClientThread extends Thread {
@@ -48,66 +49,37 @@ public class ClientThread extends Thread {
 
 		System.out.println("Client is running...");
 		UserComand user_command = null;
+		FileCommand file_command = null;
 
+		// читаем сообщение от клиента
 		user_command = this.server_interface.readMessage();
 
-		switch (user_command.getCommand()) {
+		// выполняем проверку на чтение сообщение от клиента
+		if (user_command != null) {
 
-		case "Registration": this.registrationUser(user_command.getUser()); break;
-		case "Authorization": this.authorizationUser(user_command.getUser()); break;
+			switch (user_command.getCommand()) {
+
+			case "Registration": this.server_interface.writeMessage(this.database.registrationUser(user_command.getUser())); break;
+			case "Authorization": this.server_interface.writeMessage(this.database.authorizationUser(user_command.getUser())); break;
+
+			}
+
+		} else {
+
+			file_command = this.server_interface.readFile();
+
+			if (file_command != null)
+
+			switch (file_command.getCommand()) {
+
+			case "AddImage": this.database.addFile(file_command.getFileBytes(), file_command.getFileName(), file_command.getUserLogin(), "Image");
+							 break;
+
+			}
 
 		}
 
-	}
-
-	/**
-	 * This method check user in database
-	 * @param user value of the object User
-	 * */
-	private final void authorizationUser(User user) {
-
-		String attention = new String("Check your login (password)!");
-		ResultSet result_set = null;
-
-		try {
-
-			result_set = this.database.getResult("SELECT * FROM user WHERE login=\"" + user.getUserLogin() + "\"");
-
-			if (!result_set.next()) this.server_interface.writeMessage(attention);
-			else if (result_set.getInt(9) == user.getUserPassword() &&
-					result_set.getString(8).hashCode() == user.getUserLogin().hashCode()) this.server_interface.writeMessage("Ok");
-			else this.server_interface.writeMessage(attention);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/**
-	 * This method add user into database
-	 * @param user value of the object User
-	 * */
-	private final void registrationUser(User user) {
-
-		ResultSet result_set = null;
-
-		try {
-
-			result_set = this.database.getResult("SELECT * FROM USER WHERE login=\"" + user.getUserLogin() + "\"");
-
-			if (result_set.next() && result_set.getString(8).hashCode() == user.getUserLogin().hashCode())
-				this.server_interface.writeMessage("This login is already exists!");
-			else if (!result_set.next() || (result_set.next() && result_set.getString(8).hashCode() != user.getUserLogin().hashCode())) {
-
-				this.database.addUser(user);
-				this.server_interface.writeMessage("Ok");
-
-			} else this.server_interface.writeMessage("This login is already exists!");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		System.out.println("end...");
 
 	}
 

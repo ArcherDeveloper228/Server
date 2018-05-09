@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 
 import application.User;
+import json.FileCommand;
 import json.JsonParser;
 import json.UserComand;
 
@@ -60,19 +61,25 @@ public class ServerInterface implements ConstServer {
 	@Override
 	public UserComand readMessage() {
 
-		UserComand user_comand = new UserComand();
+		UserComand user_command = null;
 		String json = null;
 
 		try {
 
-			if ((json = this.buffered_reader.readLine()) != null)
-				user_comand = this.json_parser.parseUserJson(json);
+			if ((json = this.buffered_reader.readLine()) != null) 
+				if (json.equals("User")) {
+					
+					json =  this.buffered_reader.readLine();
+					user_command = this.json_parser.parseUserJson(json);
+					
+				}
+				
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return user_comand;
+		return user_command;
 
 	}
 
@@ -88,6 +95,26 @@ public class ServerInterface implements ConstServer {
 			return true;
 
 		}
+
+	}
+
+	// реализаци€ метода получени€ данных от клиента
+	@Override
+	public FileCommand readFile() {
+
+		FileCommand file_command = null;
+		String json = null;
+		
+		try {
+			
+			if ((json = this.buffered_reader.readLine()) != null) 
+				file_command = this.json_parser.parseFileJson(json);
+						
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return file_command;
 
 	}
 
