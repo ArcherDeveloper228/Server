@@ -66,20 +66,26 @@ public class ClientThread extends Thread {
 
 		} else {
 
+			String message = null;
 			file_command = this.server_interface.readFile();
 
 			if (file_command != null)
 
 			switch (file_command.getCommand()) {
 
-			case "AddImage": this.database.addFile(file_command.getFileBytes(), file_command.getFileName(), file_command.getUserLogin(), "Image");
-							 break;
+			case "AddImage": 		message = this.database.addFile(file_command.getFileBytes(), file_command.getFileName(), 
+							 			file_command.getUserLogin(), "Image");
+							 		this.server_interface.writeMessage(message);
+							 		break;
+			case "DeleteImage": 	message = this.database.deleteFile(file_command.getFileName(), file_command.getUserLogin(), "Image");
+									this.server_interface.writeMessage(message);
+									break;
 
 			}
 
 		}
 
-		System.out.println("end...");
+		System.out.println("End...");
 
 	}
 
