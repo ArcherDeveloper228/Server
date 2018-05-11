@@ -222,6 +222,7 @@ public class Database implements IConstDatabase {
 									this.prepared_statement = (PreparedStatement) this.connection.prepareStatement(SQL_INSERT_IMAGE);
 									this.prepared_statement.setInt(2, result_set.getInt(1));
 									this.prepared_statement.setString(3, file.getPath() + file_name);
+									this.prepared_statement.executeUpdate();
 									message = new String("Ok");
 		 	 					} else ;
 								break;
@@ -249,6 +250,7 @@ public class Database implements IConstDatabase {
 
 		String message = null;
 		ResultSet result_set = null;
+		File file = null;
 		
 		try {
 			
@@ -257,7 +259,13 @@ public class Database implements IConstDatabase {
 				
 				switch (flag) {
 				
-				case "Image":	
+				case "Image":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\images\\" + file_name);
+								// выполняем проверку на существование файла
+								if (file.exists()) {
+									this.statement = (PreparedStatement) this.connection.prepareStatement("DELETE FROM ");
+									file.delete();									
+									message = new String("Ok");
+								} else message = new String("There is no such file on the server!");
 							 	break;
 				
 				}
