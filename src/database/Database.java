@@ -198,6 +198,7 @@ public class Database implements IConstDatabase {
 
 		String message = new String("File with name \"" + file_name + "\" already exists!");
 		File file = null;
+		String path = null;
 		ResultSet result_set = null;
 		BufferedImage buffered_image = null;
 
@@ -210,18 +211,19 @@ public class Database implements IConstDatabase {
 
 				case "Image":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\images\\");
 		 	 					if (!file.exists()) file.mkdir();
+		 	 					path = file.getPath();
 		 	 					file = new File(file.getPath() + "\\" + file_name);
 		 	 					// проверяем на существование такого файла
 		 	 					if (!file.exists()) {
 		 	 						try {
 										buffered_image = ImageIO.read(new ByteArrayInputStream(bytes));
-										ImageIO.write(buffered_image, this.getFileExtension(file_name), new File(file.getPath(), file_name));
+										ImageIO.write(buffered_image, this.getFileExtension(file_name), new File(path, file_name));
 									} catch (IOException e) {
 										e.printStackTrace();
 									}
 									this.prepared_statement = (PreparedStatement) this.connection.prepareStatement(SQL_INSERT_IMAGE);
-									this.prepared_statement.setInt(2, result_set.getInt(1));
-									this.prepared_statement.setString(3, file.getPath() + file_name);
+									this.prepared_statement.setInt(1, result_set.getInt(1));
+									this.prepared_statement.setString(2, file_name);
 									this.prepared_statement.executeUpdate();
 									message = new String("Ok");
 		 	 					} else ;
@@ -248,24 +250,27 @@ public class Database implements IConstDatabase {
 	 * */
 	public final String deleteFile(String file_name, String user_login, String flag) {
 
-		String message = null;
+		String message = new String("There is no such file on the server!");
 		ResultSet result_set = null;
 		File file = null;
 		
 		try {
 			
 			// проверка на существование пользователя
-			if ((result_set = this.getResult("SELECT user_id FROM user WHERE user_login=\"" + user_login + "\"")).next()) {
+			if ((result_set = this.getResult("SELECT user_id FROM user WHERE login=\"" + user_login + "\"")).next()) {
 				
 				switch (flag) {
 				
 				case "Image":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\images\\" + file_name);
 								// выполняем проверку на существование файла
 								if (file.exists()) {
-									this.statement = (PreparedStatement) this.connection.prepareStatement("DELETE FROM ");
+									this.prepared_statement = (PreparedStatement) this.connection.prepareStatement(SQL_DELETE_FROM_IMAGES +
+											"WHERE user_id='" + result_set.getInt(1) + "' AND image_path='" + file_name + "'");
+									this.prepared_statement.executeUpdate();
+									// удаляем файл из дирректории
 									file.delete();									
 									message = new String("Ok");
-								} else message = new String("There is no such file on the server!");
+								} else ;
 							 	break;
 				
 				}
