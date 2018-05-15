@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.Map;
 
 import application.User;
 import json.FileCommand;
@@ -66,14 +67,14 @@ public class ServerInterface implements ConstServer {
 
 		try {
 
-			if ((json = this.buffered_reader.readLine()) != null) 
+			if ((json = this.buffered_reader.readLine()) != null)
 				if (json.equals("User")) {
-					
+
 					json =  this.buffered_reader.readLine();
 					user_command = this.json_parser.parseUserJson(json);
-					
+
 				}
-				
+
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -104,17 +105,32 @@ public class ServerInterface implements ConstServer {
 
 		FileCommand file_command = null;
 		String json = null;
-		
+
 		try {
-			
-			if ((json = this.buffered_reader.readLine()) != null) 
+
+			if ((json = this.buffered_reader.readLine()) != null)
 				file_command = this.json_parser.parseFileJson(json);
-						
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return file_command;
+
+	}
+
+	// реализация метода передачи файлов клиенту
+	@Override
+	public boolean writeFile(Map files) {
+
+		if (this.print_stream == null) return false;
+		else {
+
+			this.print_stream.println(this.json_parser.getGson().toJson(files));
+			this.print_stream.flush();
+			return true;
+
+		}
 
 	}
 
