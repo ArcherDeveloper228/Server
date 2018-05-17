@@ -1,7 +1,5 @@
 package json;
 
-import java.io.File;
-
 import com.google.gson.Gson;
 
 import application.User;

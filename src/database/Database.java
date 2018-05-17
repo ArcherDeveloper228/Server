@@ -2,11 +2,14 @@ package database;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -15,6 +18,8 @@ import com.mysql.jdbc.PreparedStatement;
 import com.mysql.jdbc.Statement;
 
 import application.User;
+import json.Container;
+import json.ListFiles;
 /**
  * This class make connection with database mediateka
  * @author Nikita.Ustyushenko
@@ -228,7 +233,7 @@ public class Database implements IConstDatabase {
 									message = new String("Ok");
 		 	 					} else ;
 								break;
-    
+
 				}
 
 			} else ;
@@ -244,7 +249,7 @@ public class Database implements IConstDatabase {
 	/**
 	 * This method delete image from database and directory
 	 * @param file_name value of the object String what contains information about file name
-	 * @param user_login value of the object String what contains information about user login 
+	 * @param user_login value of the object String what contains information about user login
 	 * @param flag value of the object String what contains information about flag
 	 * @return value of the object String
 	 * */
@@ -253,14 +258,14 @@ public class Database implements IConstDatabase {
 		String message = new String("There is no such file on the server!");
 		ResultSet result_set = null;
 		File file = null;
-		
+
 		try {
-			
+
 			// проверка на существование пользователя
 			if ((result_set = this.getResult("SELECT user_id FROM user WHERE login=\"" + user_login + "\"")).next()) {
-				
+
 				switch (flag) {
-				
+
 				case "Image":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\images\\" + file_name);
 								// выполняем проверку на существование файла
 								if (file.exists()) {
@@ -268,20 +273,92 @@ public class Database implements IConstDatabase {
 											"WHERE user_id='" + result_set.getInt(1) + "' AND image_path='" + file_name + "'");
 									this.prepared_statement.executeUpdate();
 									// удаляем файл из дирректории
-									file.delete();									
+									file.delete();
 									message = new String("Ok");
 								} else ;
 							 	break;
-				
+
 				}
-				
-			}
-			
+
+			} else ;
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return message;
+
+	}
+
+	/**
+	 * This method load images from database
+	 * @param user_login value of the object String what contains information about user login
+	 * @return object of the collection Map<K,V>
+	 * */
+	public final Container loadImages(String user_login) {
+
+		Container images = null;
+		File file = null;
+		ResultSet result_set_1 = null;
+		ResultSet result_set_2 = null;
+
+		try {
+
+			// проверяем на существование пользователя
+			if ((result_set_1 = this.getResult(SQL_SELECT_USER + "WHERE login=\"" + user_login + "\"")).next()) {
+
+				// проверяем на существование картинок пользователя в базе данных
+				if ((result_set_2 = this.getResult(SQL_SELECT_IMAGE + "WHERE user_id=\"" + result_set_1.getInt(1) + "\"")).next()) {
+
+					images = new Container();
+					file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login +
+										"\\images\\" + result_set_2.getString(3));
+					images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
+
+					while (result_set_2.next()) {
+
+						file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login +
+											"\\images\\" + result_set_2.getString(3));
+						images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
+
+					}
+
+				} else ;
+
+			} else ;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return images;
+
+	}
+
+	/**
+	 * This method return array file bytes
+	 * @param file value of the object File
+	 * @return array file bytes
+	 * */
+	public byte[] getFileBytes(File file) {
+
+		byte[] file_bytes = null;
+		String extension = null;
+
+		try {
+
+			extension = this.getFileExtension(file.getName());
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			BufferedImage buffered_image = ImageIO.read(file);
+
+			ImageIO.write(buffered_image, extension, baos);
+			file_bytes = baos.toByteArray();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return file_bytes;
 
 	}
 

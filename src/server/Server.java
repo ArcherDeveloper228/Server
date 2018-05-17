@@ -11,11 +11,14 @@ import database.Database;
  * @author Nikita.Ustyushenko
  * @version 1.0
  * */
-public class Server extends Thread {
+public final class Server extends Thread {
+
+	/** Property - flag */
+	private final static Server instance = new Server();
 
 	/** Property - port */
 	private static final int SERVER_PORT = 8080;
-	
+
 	/** Property - database */
 	private Database database;
 
@@ -31,18 +34,28 @@ public class Server extends Thread {
 	/**
 	 * Make new object Server
 	 * */
-	public Server() {
+	private Server() {
 
 		this.count_clients = 0;
 		this.database = new Database();
 		this.socket = null;
 
-		// выполняем создание сервер сокета с портом 8080
+		// выполняем создание сервер сокета с портом
 		try {
 			this.server_socket = new ServerSocket(SERVER_PORT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	/**
+	 * This method create singleton
+	 * @return value of the object Server
+	 * */
+	public static Server getInstance() {
+
+		return instance;
 
 	}
 

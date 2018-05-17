@@ -1,7 +1,6 @@
 package server;
 
-import java.util.Map;
-
+import json.Container;
 import json.FileCommand;
 import json.UserComand;
 
@@ -9,7 +8,7 @@ public interface ConstServer {
 
 	boolean writeMessage(String message);
 	UserComand readMessage();
-	boolean writeFile(Map files);
+	boolean writeFile(Container files);
 	FileCommand readFile();
 
 }

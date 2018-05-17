@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.Map;
 
 import application.User;
+import json.Container;
 import json.FileCommand;
 import json.JsonParser;
 import json.UserComand;
@@ -121,7 +121,7 @@ public class ServerInterface implements ConstServer {
 
 	// реализация метода передачи файлов клиенту
 	@Override
-	public boolean writeFile(Map files) {
+	public boolean writeFile(Container files) {
 
 		if (this.print_stream == null) return false;
 		else {

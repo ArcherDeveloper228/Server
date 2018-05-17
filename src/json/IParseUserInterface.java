@@ -1,7 +1,5 @@
 package json;
 
-import java.io.File;
-
 import application.User;
 
 public interface IParseUserInterface {
