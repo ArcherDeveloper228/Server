@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -132,7 +133,7 @@ public class Database implements IConstDatabase {
 				return message;
 			else if (!result_set.next() || (result_set.next() && result_set.getString(8).hashCode() != user.getUserLogin().hashCode())) {
 
-				file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user.getUserLogin());
+				file = new File(CURRENT_DIRECTORY + user.getUserLogin());
 
 				if (!file.exists()) file.mkdir();
 
@@ -172,7 +173,7 @@ public class Database implements IConstDatabase {
 
 				switch (flag) {
 
-				case "Image":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\images\\");
+				case "Image":	file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\");
 		 	 					if (!file.exists()) file.mkdir();
 		 	 					path = file.getPath();
 		 	 					file = new File(file.getPath() + "\\" + file_name);
@@ -189,7 +190,7 @@ public class Database implements IConstDatabase {
 		 	 					} else ;
 								break;
 
-				case "Music":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\music\\");
+				case "Music":	file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\music\\");
 								if (!file.exists()) file.mkdir();
 								path = file.getPath();
 								file = new File(file.getPath() + "\\" + file_name);
@@ -237,7 +238,7 @@ public class Database implements IConstDatabase {
 
 				switch (flag) {
 
-				case "Image":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\images\\" + file_name);
+				case "Image":	file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + file_name);
 								// выполняем проверку на существование файла
 								if (file.exists()) {
 									SQLQueries.deleteImage(this.connection, file_name, result_set.getInt(1));
@@ -279,17 +280,13 @@ public class Database implements IConstDatabase {
 				// проверяем на существование картинок пользователя в базе данных
 				if ((result_set_2 = SQLQueries.getImages(this.connection, result_set_1.getInt(1))).next()) {
 
-					System.out.println("z tut");
 					images = new Container();
-					System.out.println(result_set_2.getString(3));
-					file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login +
-										"\\images\\" + result_set_2.getString(3));
+					file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + result_set_2.getString(3));
 					images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
 
 					while (result_set_2.next()) {
 
-						file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login +
-											"\\images\\" + result_set_2.getString(3));
+						file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + result_set_2.getString(3));
 						images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
 
 					}
