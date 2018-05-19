@@ -4,12 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -91,46 +90,6 @@ public class Database implements IConstDatabase {
 	}
 
 	/**
-	 * This method add user in database
-	 * @param user it is object contains information about user
-	 * */
-	public void addUser(User user) {
-
-		try {
-
-			this.prepared_statement = (PreparedStatement) this.connection.prepareStatement(SQL_INSERT_USER);
-
-			this.prepared_statement.setString(1, user.getName());
-			this.prepared_statement.setString(2, user.getSurname());
-			this.prepared_statement.setInt(3, user.getDayOfBirth());
-			this.prepared_statement.setString(4, user.getMonthOfBirth());
-			this.prepared_statement.setInt(5, user.getYearOfBirth());
-			this.prepared_statement.setString(6, user.getSex());
-			this.prepared_statement.setString(7, user.getUserLogin());
-			this.prepared_statement.setInt(8, user.getUserPassword());
-
-			this.prepared_statement.executeUpdate();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-
-			// если объект PreparedStatement не null, то закрываем его
-			if (this.prepared_statement != null) {
-
-				try {
-					this.prepared_statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-
-			}
-
-		}
-
-	}
-
-	/**
 	 * This method check user in database
 	 * @param user value of the object User
 	 * */
@@ -141,8 +100,7 @@ public class Database implements IConstDatabase {
 
 		try {
 
-			result_set = this.getResult("SELECT * FROM user WHERE login=\"" + user.getUserLogin() + "\"");
-
+			result_set = SQLQueries.getUser(this.connection, user.getUserLogin());
 			if (!result_set.next()) return attention;
 			else if (result_set.getInt(9) == user.getUserPassword() &&
 					result_set.getString(8).hashCode() == user.getUserLogin().hashCode()) return new String("Ok");
@@ -168,7 +126,7 @@ public class Database implements IConstDatabase {
 
 		try {
 
-			result_set = this.getResult("SELECT * FROM USER WHERE login=\"" + user.getUserLogin() + "\"");
+			result_set = SQLQueries.getUser(this.connection, user.getUserLogin());
 
 			if (result_set.next() && result_set.getString(8).hashCode() == user.getUserLogin().hashCode())
 				return message;
@@ -178,7 +136,7 @@ public class Database implements IConstDatabase {
 
 				if (!file.exists()) file.mkdir();
 
-				this.addUser(user);
+				SQLQueries.addUser(this.connection, user);
 				return new String("Ok");
 
 			} else return message;
@@ -210,7 +168,7 @@ public class Database implements IConstDatabase {
 		try {
 
 			// проверяем на существование такого пользователя
-			if ((result_set = this.getResult("SELECT user_id FROM user WHERE login=\"" + user_login + "\"")).next()) {
+			if ((result_set = SQLQueries.getUser(this.connection, user_login)).next()) {
 
 				switch (flag) {
 
@@ -226,13 +184,26 @@ public class Database implements IConstDatabase {
 									} catch (IOException e) {
 										e.printStackTrace();
 									}
-									this.prepared_statement = (PreparedStatement) this.connection.prepareStatement(SQL_INSERT_IMAGE);
-									this.prepared_statement.setInt(1, result_set.getInt(1));
-									this.prepared_statement.setString(2, file_name);
-									this.prepared_statement.executeUpdate();
+									SQLQueries.addImage(this.connection, file_name, result_set.getInt(1));
 									message = new String("Ok");
 		 	 					} else ;
 								break;
+
+				case "Music":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\music\\");
+								if (!file.exists()) file.mkdir();
+								path = file.getPath();
+								file = new File(file.getPath() + "\\" + file_name);
+								// проверяем на существование такого файла
+								if (!file.exists()) {
+									try {
+										FileOutputStream file_output_stream = new FileOutputStream(file);
+										file_output_stream.write(bytes);
+										file_output_stream.close();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+									message = new String("Ok");
+								} else ;
 
 				}
 
@@ -262,16 +233,14 @@ public class Database implements IConstDatabase {
 		try {
 
 			// проверка на существование пользователя
-			if ((result_set = this.getResult("SELECT user_id FROM user WHERE login=\"" + user_login + "\"")).next()) {
+			if ((result_set = SQLQueries.getUser(this.connection, user_login)).next()) {
 
 				switch (flag) {
 
 				case "Image":	file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login + "\\images\\" + file_name);
 								// выполняем проверку на существование файла
 								if (file.exists()) {
-									this.prepared_statement = (PreparedStatement) this.connection.prepareStatement(SQL_DELETE_FROM_IMAGES +
-											"WHERE user_id='" + result_set.getInt(1) + "' AND image_path='" + file_name + "'");
-									this.prepared_statement.executeUpdate();
+									SQLQueries.deleteImage(this.connection, file_name, result_set.getInt(1));
 									// удаляем файл из дирректории
 									file.delete();
 									message = new String("Ok");
@@ -305,12 +274,14 @@ public class Database implements IConstDatabase {
 		try {
 
 			// проверяем на существование пользователя
-			if ((result_set_1 = this.getResult(SQL_SELECT_USER + "WHERE login=\"" + user_login + "\"")).next()) {
+			if ((result_set_1 = SQLQueries.getUser(this.connection, user_login)).next()) {
 
 				// проверяем на существование картинок пользователя в базе данных
-				if ((result_set_2 = this.getResult(SQL_SELECT_IMAGE + "WHERE user_id=\"" + result_set_1.getInt(1) + "\"")).next()) {
+				if ((result_set_2 = SQLQueries.getImages(this.connection, result_set_1.getInt(1))).next()) {
 
+					System.out.println("z tut");
 					images = new Container();
+					System.out.println(result_set_2.getString(3));
 					file = new File("D:\\eclipse\\workspace\\Server\\src\\database\\" + user_login +
 										"\\images\\" + result_set_2.getString(3));
 					images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));

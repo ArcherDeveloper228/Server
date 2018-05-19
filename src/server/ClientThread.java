@@ -59,7 +59,7 @@ public class ClientThread extends Thread {
 			switch (user_command.getCommand()) {
 
 			case "Registration": this.server_interface.writeMessage(this.database.registrationUser(user_command.getUser())); break;
-			
+
 			case "Authorization": this.server_interface.writeMessage(this.database.authorizationUser(user_command.getUser())); break;
 
 			}
@@ -75,13 +75,17 @@ public class ClientThread extends Thread {
 			case "AddImage":		this.server_interface.writeMessage(this.database.addFile(file_command.getFileBytes(),
 										file_command.getFileName(), file_command.getUserLogin(), "Image"));
 							 		break;
-							 		
+
 			case "DeleteImage": 	this.server_interface.writeMessage(this.database.deleteFile(file_command.getFileName(),
 										file_command.getUserLogin(), "Image"));
 									break;
-									
-			case "LoadImages":		this.server_interface.writeFile(this.database.loadImages(file_command.getUserLogin())); 
-									break;						
+
+			case "LoadImages":		this.server_interface.writeFile(this.database.loadImages(file_command.getUserLogin()));
+									break;
+
+			case "AddMusic":		this.server_interface.writeMessage(this.database.addFile(file_command.getFileBytes(),
+										file_command.getFileName(), file_command.getUserLogin(), "Music"));
+									break;
 
 			}
 
