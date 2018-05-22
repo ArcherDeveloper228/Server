@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,8 +13,6 @@ import java.sql.SQLException;
 import javax.imageio.ImageIO;
 
 import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
 
 import application.User;
 import json.Container;
@@ -30,19 +27,10 @@ public class Database implements IConstDatabase {
 	/** Property - connection */
 	private Connection connection;
 
-	/** Property - statement */
-	private Statement statement;
-
-	/** Property - prepared_statement */
-	private PreparedStatement prepared_statement;
-
 	/**
 	 * Make new object Database
 	 * */
 	public Database() {
-
-		this.statement = null;
-		this.prepared_statement = null;
 
 		try {
 			this.connection = (Connection) DriverManager.getConnection(URL, CLIENT_NAME, CLIENT_PASSWORD);
@@ -50,23 +38,6 @@ public class Database implements IConstDatabase {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	public ResultSet getResult(String inquiry) {
-
-		ResultSet result_set = null;
-
-		try {
-
-			this.statement = (Statement) this.connection.createStatement();
-			result_set = this.statement.executeQuery(inquiry);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return result_set;
 
 	}
 
@@ -133,7 +104,7 @@ public class Database implements IConstDatabase {
 				return message;
 			else if (!result_set.next() || (result_set.next() && result_set.getString(8).hashCode() != user.getUserLogin().hashCode())) {
 
-				file = new File(CURRENT_DIRECTORY + user.getUserLogin());
+				file = new File(this.createFilePath(user.getUserLogin(), null, "RegistrationUser"));
 
 				if (!file.exists()) file.mkdir();
 
@@ -173,10 +144,10 @@ public class Database implements IConstDatabase {
 
 				switch (flag) {
 
-				case "Image":	file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\");
+				case "Image":	file = new File(this.createFilePath(user_login, null, "MakeDirImages"));
 		 	 					if (!file.exists()) file.mkdir();
 		 	 					path = file.getPath();
-		 	 					file = new File(file.getPath() + "\\" + file_name);
+		 	 					file = new File(this.createFilePath(user_login, file_name, "MakeFileImage"));
 		 	 					// проверяем на существование такого файла
 		 	 					if (!file.exists()) {
 		 	 						try {
@@ -190,10 +161,10 @@ public class Database implements IConstDatabase {
 		 	 					} else ;
 								break;
 
-				case "Music":	file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\music\\");
+				case "Music":	file = new File(this.createFilePath(user_login, null, "MakeDirMusic"));
 								if (!file.exists()) file.mkdir();
 								path = file.getPath();
-								file = new File(file.getPath() + "\\" + file_name);
+								file = new File(this.createFilePath(user_login, file_name, "MakeFileMusic"));
 								// проверяем на существование такого файла
 								if (!file.exists()) {
 									try {
@@ -203,8 +174,10 @@ public class Database implements IConstDatabase {
 									} catch (IOException e) {
 										e.printStackTrace();
 									}
+									SQLQueries.addMusic(this.connection, file_name, result_set.getInt(1));
 									message = new String("Ok");
 								} else ;
+								break;
 
 				}
 
@@ -238,7 +211,7 @@ public class Database implements IConstDatabase {
 
 				switch (flag) {
 
-				case "Image":	file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + file_name);
+				case "Image":	file = new File(this.createFilePath(user_login, file_name, "MakeFileImage"));
 								// выполняем проверку на существование файла
 								if (file.exists()) {
 									SQLQueries.deleteImage(this.connection, file_name, result_set.getInt(1));
@@ -281,12 +254,12 @@ public class Database implements IConstDatabase {
 				if ((result_set_2 = SQLQueries.getImages(this.connection, result_set_1.getInt(1))).next()) {
 
 					images = new Container();
-					file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + result_set_2.getString(3));
+					file = new File(this.createFilePath(user_login, result_set_2.getString(3), "MakeFileImage"));
 					images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
 
 					while (result_set_2.next()) {
 
-						file = new File(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + result_set_2.getString(3));
+						file = new File(this.createFilePath(user_login, result_set_2.getString(3), "MakeFileImage"));
 						images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
 
 					}
@@ -300,6 +273,31 @@ public class Database implements IConstDatabase {
 		}
 
 		return images;
+
+	}
+
+	/**
+	 * This method create file path
+	 * @param user_login value of the object String what contains information about user login
+	 * @param file_name value of the object String what contains information about file name
+	 * @param flag value of the object String
+	 * @return value of the object String what contains information about file path
+	 * */
+	public String createFilePath(String user_login, String file_name, String flag) {
+
+		String file_path = null;
+
+		switch (flag) {
+
+		case "RegistrationUser": 	file_path = new String(CURRENT_DIRECTORY + "\\" + user_login); break;
+		case "MakeDirImages": 		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\"); break;
+		case "MakeDirMusic": 		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\music\\"); break;
+		case "MakeFileImage":		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + file_name); break;
+		case "MakeFileMusic":		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\music\\" + file_name); break;
+
+		}
+
+		return file_path;
 
 	}
 
