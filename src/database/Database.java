@@ -27,10 +27,15 @@ public class Database implements IConstDatabase {
 	/** Property - connection */
 	private Connection connection;
 
+	/** Property - path_resolver */
+	private PathResolver path_resolver;
+
 	/**
 	 * Make new object Database
 	 * */
 	public Database() {
+
+		this.path_resolver = PathResolver.getInstance();
 
 		try {
 			this.connection = (Connection) DriverManager.getConnection(URL, CLIENT_NAME, CLIENT_PASSWORD);
@@ -104,7 +109,8 @@ public class Database implements IConstDatabase {
 				return message;
 			else if (!result_set.next() || (result_set.next() && result_set.getString(8).hashCode() != user.getUserLogin().hashCode())) {
 
-				file = new File(this.createFilePath(user.getUserLogin(), null, "RegistrationUser"));
+				this.path_resolver.setUserLogin(user.getUserLogin());
+				file = new File(this.path_resolver.getDatabasePath());
 
 				if (!file.exists()) file.mkdir();
 
@@ -139,15 +145,17 @@ public class Database implements IConstDatabase {
 
 		try {
 
+			this.path_resolver.setUserLogin(user_login);
+
 			// проверяем на существование такого пользователя
 			if ((result_set = SQLQueries.getUser(this.connection, user_login)).next()) {
 
 				switch (flag) {
 
-				case "Image":	file = new File(this.createFilePath(user_login, null, "MakeDirImages"));
+				case "Image":	file = new File(this.path_resolver.getImagesPath());
 		 	 					if (!file.exists()) file.mkdir();
 		 	 					path = file.getPath();
-		 	 					file = new File(this.createFilePath(user_login, file_name, "MakeFileImage"));
+		 	 					file = new File(this.path_resolver.getFileImagePath(file_name));
 		 	 					// проверяем на существование такого файла
 		 	 					if (!file.exists()) {
 		 	 						try {
@@ -161,10 +169,10 @@ public class Database implements IConstDatabase {
 		 	 					} else ;
 								break;
 
-				case "Music":	file = new File(this.createFilePath(user_login, null, "MakeDirMusic"));
+				case "Music":	file = new File(this.path_resolver.getMusicPath());
 								if (!file.exists()) file.mkdir();
 								path = file.getPath();
-								file = new File(this.createFilePath(user_login, file_name, "MakeFileMusic"));
+								file = new File(this.path_resolver.getFileMusicPath(file_name));
 								// проверяем на существование такого файла
 								if (!file.exists()) {
 									try {
@@ -206,12 +214,14 @@ public class Database implements IConstDatabase {
 
 		try {
 
+			this.path_resolver.setUserLogin(user_login);
+
 			// проверка на существование пользователя
 			if ((result_set = SQLQueries.getUser(this.connection, user_login)).next()) {
 
 				switch (flag) {
 
-				case "Image":	file = new File(this.createFilePath(user_login, file_name, "MakeFileImage"));
+				case "Image":	file = new File(this.path_resolver.getFileImagePath(file_name));
 								// выполняем проверку на существование файла
 								if (file.exists()) {
 									SQLQueries.deleteImage(this.connection, file_name, result_set.getInt(1));
@@ -247,6 +257,8 @@ public class Database implements IConstDatabase {
 
 		try {
 
+			this.path_resolver.setUserLogin(user_login);
+
 			// проверяем на существование пользователя
 			if ((result_set_1 = SQLQueries.getUser(this.connection, user_login)).next()) {
 
@@ -254,12 +266,12 @@ public class Database implements IConstDatabase {
 				if ((result_set_2 = SQLQueries.getImages(this.connection, result_set_1.getInt(1))).next()) {
 
 					images = new Container();
-					file = new File(this.createFilePath(user_login, result_set_2.getString(3), "MakeFileImage"));
+					file = new File(this.path_resolver.getFileImagePath(result_set_2.getString(3)));
 					images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
 
 					while (result_set_2.next()) {
 
-						file = new File(this.createFilePath(user_login, result_set_2.getString(3), "MakeFileImage"));
+						file = new File(this.path_resolver.getFileImagePath(result_set_2.getString(3)));
 						images.addElement(new ListFiles(result_set_2.getString(3), this.getFileBytes(file)));
 
 					}
@@ -273,31 +285,6 @@ public class Database implements IConstDatabase {
 		}
 
 		return images;
-
-	}
-
-	/**
-	 * This method create file path
-	 * @param user_login value of the object String what contains information about user login
-	 * @param file_name value of the object String what contains information about file name
-	 * @param flag value of the object String
-	 * @return value of the object String what contains information about file path
-	 * */
-	public String createFilePath(String user_login, String file_name, String flag) {
-
-		String file_path = null;
-
-		switch (flag) {
-
-		case "RegistrationUser": 	file_path = new String(CURRENT_DIRECTORY + "\\" + user_login); break;
-		case "MakeDirImages": 		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\"); break;
-		case "MakeDirMusic": 		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\music\\"); break;
-		case "MakeFileImage":		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\images\\" + file_name); break;
-		case "MakeFileMusic":		file_path = new String(CURRENT_DIRECTORY + "\\" + user_login + "\\music\\" + file_name); break;
-
-		}
-
-		return file_path;
 
 	}
 
